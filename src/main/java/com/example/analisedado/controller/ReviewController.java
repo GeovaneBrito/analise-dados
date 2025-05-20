@@ -1,6 +1,7 @@
 package com.example.analisedado.controller;
 
 import com.example.analisedado.model.Player;
+import com.example.analisedado.model.PlayerResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,16 @@ public class ReviewController {
 
     @PostMapping("/users")
     public String users( @RequestBody List<Player> player){
+        long tempoInicial  = System.currentTimeMillis();
         httpSession.setAttribute("player", player);
-        return "vai caaarai";
+        long tempoFinal = System.currentTimeMillis();
+        long tempoTotal = tempoFinal - tempoInicial;
+        return "Tempo de execucao : " + tempoTotal + " ms";
     }
 
     @GetMapping("/superusers")
-    public ResponseEntity<List<Player>> superUsers(){
-        String tempoInicial = String.valueOf(new Date().getTime());
+    public ResponseEntity<PlayerResponse> superUsers(){
+        long tempoInicial  = System.currentTimeMillis();
         Object objectSession = httpSession.getAttribute("player");
         if(objectSession ==null){
             return new ResponseEntity(new Erro("produto nao encontrado"), HttpStatus.NOT_FOUND);
@@ -46,9 +50,12 @@ public class ReviewController {
         if(superUsers.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        String tempoFinal = String.valueOf(new Date().getTime());
-
-        return ResponseEntity.ok(superUsers);
+        long tempoFinal = System.currentTimeMillis();
+        long tempoTotal = tempoFinal - tempoInicial;
+        PlayerResponse playerResponse = new PlayerResponse();
+        playerResponse.setPlayers(superUsers);
+        playerResponse.setTempoFinal(tempoTotal);
+        return ResponseEntity.ok(playerResponse);
     }
 
     @GetMapping("/top-countries")
